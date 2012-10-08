@@ -160,7 +160,13 @@
 
 (define (catchNote note)
     (set! thefreq (note2freq note))
-    (format t "notex %s freq %f\n" note thefreq)
+;    (format t "notex %s freq %f\n" note thefreq)
+    (set! ourfreqs (append ourfreqs (list thefreq)))
+    thefreq
+)
+
+(define (catchFreq freq)
+    (set! thefreq (parse-number freq))
     (set! ourfreqs (append ourfreqs (list thefreq)))
     thefreq
 )
