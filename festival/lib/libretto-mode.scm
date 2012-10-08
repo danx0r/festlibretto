@@ -134,9 +134,9 @@
   (set! freqs (car (car (cdr (assoc 'FREQ atts)))))
   (set! notes (car (car (cdr (assoc 'NOTE atts)))))
     (if (or (equal? notes nil) (equal? notes 'X))
-	  (mapcar (lambda (x) (parse-number x))
+	  (mapcar (lambda (x) (catchFreq x))
 			  (string2list freqs))
-	  (mapcar (lambda (x) (note2freq x))
+	  (mapcar (lambda (x) (catchNote x))
 			  (string2list notes))))
 
 ;;
@@ -156,9 +156,14 @@
   (set! midinote (+ (* 12 (parse-number octave))
 					(notename2midioffset notename)))
   (set! thefreq (midinote2freq midinote))
-  (format t "notex %s freq %f\n" note thefreq)
-  (set! ourfreqs (append ourfreqs (list thefreq)))
   thefreq)
+
+(define (catchNote note)
+    (set! thefreq (note2freq note))
+    (format t "notex %s freq %f\n" note thefreq)
+    (set! ourfreqs (append ourfreqs (list thefreq)))
+    thefreq
+)
 
 ;;
 ;; midinote2freq
