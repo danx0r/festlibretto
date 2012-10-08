@@ -74,7 +74,7 @@ check_makefile()
 create_empty_makefile()
 {
     echo "  Creating Makefile"
-    cp '/home/dbm/src/festival/2.1/speech_tools'/lib/est_program_makefile Makefile
+    cp '/home/dbm/src/festival/festlibretto2.1/speech_tools'/lib/est_program_makefile Makefile
     chmod +w Makefile
 }
 
@@ -96,7 +96,7 @@ create_mainline()
 {
     m=$1
     echo "  Creating $m"
-    cp '/home/dbm/src/festival/2.1/speech_tools'/lib/est_mainline "$m"
+    cp '/home/dbm/src/festival/festlibretto2.1/speech_tools'/lib/est_mainline "$m"
     chmod +w "$m"
 }
 
@@ -184,7 +184,7 @@ extend() {
 	eval "export $var"
 	}
 
-extend LD_LIBRARY_PATH "/home/dbm/src/festival/2.1/speech_tools/lib:"
+extend LD_LIBRARY_PATH "/home/dbm/src/festival/festlibretto2.1/speech_tools/lib:"
 
 
 UNDERLINE="sed -e '{p;s/[^ 	]/=/g;}'"

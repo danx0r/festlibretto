@@ -59,7 +59,7 @@ extend() {
 	eval "export $var"
 	}
 
-extend LD_LIBRARY_PATH "/home/dbm/src/festival/2.1/speech_tools/lib:"
+extend LD_LIBRARY_PATH "/home/dbm/src/festival/festlibretto2.1/speech_tools/lib:"
 
 
 exec gdb "$@"
