@@ -157,7 +157,7 @@
 					(notename2midioffset notename)))
   (set! thefreq (midinote2freq midinote))
   (format t "notex %s freq %f\n" note thefreq)
-  (set! ourfreqs (append ourfreqs (list thefreq thefreq)))
+;  (set! ourfreqs (append ourfreqs (list thefreq thefreq)))
   thefreq)
 
 ;;
@@ -272,8 +272,8 @@
   (mapcar singing_adjcons_syllable (utt.relation.items utt 'Syllable))  
   (mapcar singing_do_syllable (utt.relation.items utt 'Syllable))
   (mapcar singing_fix_segment (utt.relation.items utt 'Segment))
-  (format t "DEBUG ourfreqs before: %l\n" ourfreqs)
-  (set! ourfreqs (average_pairs ourfreqs))
+;  (format t "DEBUG ourfreqs before: %l\n" ourfreqs)
+;  (set! ourfreqs (average_pairs ourfreqs))
   (format t "DEBUG ourfreqs after: %l\n" ourfreqs)
   utt)
 
@@ -480,9 +480,9 @@
 
 (define (singing_init_func)
   "(singing_init_func) - Initialization for Singing mode"
-  ;;(set! ourfreqs (list 200 170  160 145  140 130  210 185  180 160  150 160  165 155  140 126))
+  (set! ourfreqs (list 50 50 200 100  100 200))
   (set! bugg 0)
-  (set! ourfreqs ())
+  ;(set! ourfreqs ())
 
   ;; use mwm's voice, it's very nice (or tll for female)
   (set! phoneme_durations  duration_ph_info)
