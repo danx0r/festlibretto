@@ -1,5 +1,5 @@
 #!/bin/sh
-"true" ; exec /home/dbm/src/festival/2.1/festival/bin/festival --script $0 $*
+"true" ; exec /home/dbm/src/festival/festlibretto2.1/festival/bin/festival --script $0 $*
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-*-mode:scheme-*-
 ;;                                                                       ;;
 ;;                Centre for Speech Technology Research                  ;;
