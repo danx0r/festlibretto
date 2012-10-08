@@ -157,7 +157,7 @@
 					(notename2midioffset notename)))
   (set! thefreq (midinote2freq midinote))
   (format t "notex %s freq %f\n" note thefreq)
-;  (set! ourfreqs (append ourfreqs (list thefreq thefreq)))
+  (set! ourfreqs (append ourfreqs (list thefreq)))
   thefreq)
 
 ;;
@@ -480,9 +480,9 @@
 
 (define (singing_init_func)
   "(singing_init_func) - Initialization for Singing mode"
-  (set! ourfreqs (list 50 50 200 100  100 200))
+  ;(set! ourfreqs (list 50 50 200 100  100 200))
   (set! bugg 0)
-  ;(set! ourfreqs ())
+  (set! ourfreqs ())
 
   ;; use mwm's voice, it's very nice (or tll for female)
   (set! phoneme_durations  duration_ph_info)
