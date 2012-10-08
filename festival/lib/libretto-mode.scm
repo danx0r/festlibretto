@@ -259,33 +259,11 @@
 ;; each one does.
 ;;
 
-(define (average_pairs lst)
-    (let ((retn) (looper))
-        (set! retn ())
-        (define (looper i)
-            (set! a (nth i lst))
-            (if (< i (- (length lst) 2) )
-                (set! b (nth (+ i 2) lst))
-                (set! b (- a 30))
-            )
-            (set! b (- (/ (+ a a b) 3) 9))
-            (set! retn (append retn (list a b)))
-            (format t "%d %d\n" a b)
-            (set! i (+ i 2))
-            (if (< i (length lst)) (looper i))
-        )
-        (looper 0)
-        retn
-    )
-)
-
 (define (singing_duration_method utt)
   (mapcar singing_adjcons_syllable (utt.relation.items utt 'Syllable))  
   (mapcar singing_do_syllable (utt.relation.items utt 'Syllable))
   (mapcar singing_fix_segment (utt.relation.items utt 'Segment))
-;  (format t "DEBUG ourfreqs before: %l\n" ourfreqs)
-;  (set! ourfreqs (average_pairs ourfreqs))
-  (format t "DEBUG ourfreqs after: %l\n" ourfreqs)
+  (format t "DEBUG ourfreqs: %l\n" ourfreqs)
   utt)
 
 ;;
