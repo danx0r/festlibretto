@@ -46,6 +46,11 @@
    (set! singing_global_time 0.0)
    (set! singing_bpm (get-bpm ATTLIST))
    (set! singing_bps (/ singing_bpm 60.0))
+   (set! ignore_durations (get-ignoredurs ATTLIST))
+   (format t "DEBUG ignore_durations: %l\n" ignore_durations)
+   (if ignore_durations
+       nil 
+       (Parameter.set 'Duration_Method singing_duration_method) )
    nil
   )
 
@@ -96,6 +101,13 @@
 
 (define (get-bpm atts)
   (parse-number (car (car (cdr (assoc 'BPM atts))))))
+
+;;; dbm
+(define (get-ignoredurs atts)
+    (equal?
+        'true
+        (car (car (cdr (assoc 'IGNOREDURATIONS atts))))) )
+
 
 ;;
 ;; get-durs
@@ -263,7 +275,6 @@
   (mapcar singing_adjcons_syllable (utt.relation.items utt 'Syllable))  
   (mapcar singing_do_syllable (utt.relation.items utt 'Syllable))
   (mapcar singing_fix_segment (utt.relation.items utt 'Segment))
-  (format t "DEBUG ourfreqs: %l\n" ourfreqs)
   utt)
 
 ;;
@@ -487,7 +498,7 @@
 		 (list 'targ_func singing_f0_targets)))
 
   ;; use our duration function
-  (Parameter.set 'Duration_Method singing_duration_method)
+;  (Parameter.set 'Duration_Method singing_duration_method)
 
   ;; use our xml parsing function
   (set! singing_previous_elements xxml_elements)
