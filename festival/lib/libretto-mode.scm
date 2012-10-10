@@ -47,10 +47,13 @@
    (set! singing_bpm (get-bpm ATTLIST))
    (set! singing_bps (/ singing_bpm 60.0))
    (set! ignore_durations (get-ignoredurs ATTLIST))
+   (set! durations_multiply (get-durmul ATTLIST))
    (format t "DEBUG ignore_durations: %l\n" ignore_durations)
-   (if ignore_durations
+   (if (or ignore_durations durations_multiply)
        nil 
        (Parameter.set 'Duration_Method singing_duration_method) )
+   (if durations_multiply
+       (Parameter.set 'Duration_Method libretto_duration_method) )
    nil
   )
 
@@ -102,12 +105,16 @@
 (define (get-bpm atts)
   (parse-number (car (car (cdr (assoc 'BPM atts))))))
 
-;;; dbm
+;;; danx0r
 (define (get-ignoredurs atts)
     (equal?
         'true
         (car (car (cdr (assoc 'IGNOREDURATIONS atts))))) )
 
+(define (get-durmul atts)
+    (equal?
+        'true
+        (car (car (cdr (assoc 'DURATIONSMULTIPLY atts))))) )
 
 ;;
 ;; get-durs
@@ -440,6 +447,80 @@
 ;; get the duration offset of a phone (see the description above)
 (define (get_duration_offset phone)
   (parse-number (car (cdr (assoc_string phone phoneme_offsets)))))
+
+
+;;; danx0r Libretto functions -- durations (in seconds) multiply standard syllable durs (so they're not beats or seconds at all)
+
+(define (libretto_duration_method utt)
+  (mapcar libretto_do_syllable (utt.relation.items utt 'Syllable))
+  (mapcar singing_fix_segment (utt.relation.items utt 'Segment))
+  utt)
+
+(define (libretto_do_syllable syl)
+  (set! conslen 0.0)
+  (set! vowlen 0.0)
+  (set! numphones 0)
+  ;; sum up the length of all of the vowels and consonants in
+  ;; this syllable
+  (mapcar (lambda (s)
+			(set! slen (get_avg_duration (item.feat s "name")))
+			(set! numphones (+ 1 numphones))
+			(if (equal? "+" (item.feat s "ph_vc"))
+				(set! vowlen (+ vowlen slen))
+				(set! conslen (+ conslen slen))))
+		  (item.leafs (item.relation syl 'SylStructure)))
+  (set! totlen (+ conslen vowlen))
+  (format t "Vowlen: %f conslen: %f totlen: %f\n" vowlen conslen totlen)
+  (set! syldur (syl2dur syl))
+  (set! addoffset (item.feat syl 'addoffset))
+  (set! subtractoffset (item.feat syl 'subtractoffset))
+  (set! offset (- subtractoffset addoffset))
+  (if (< offset (/ syldur 2.0))
+	  (let ()
+		(set! syldur (- syldur offset))
+		(format t "Offset: %f\n" offset)))
+  ;;; danx0r: syldur is what is specified in the xml. In this mode, it is used as a multiplier
+  ;;; applied to the normal syllable length (totlen).
+  (format t "multiplier: %f\n" syldur)
+  (set! syldur (* totlen syldur))
+  (format t "actual syllable length: %f\n" syldur)
+  (if (> totlen syldur)
+	  ;; if the total length of the average durations in the syllable is
+	  ;; greater than the total desired duration of the syllable, stretch
+	  ;; the time proportionally for each phone
+	  (let ((stretch (/ syldur totlen)))
+		(mapcar (lambda (s)
+				  (set! slen (get_avg_duration (item.feat s "name")))
+				  (set! slen (* stretch slen))
+				  (set! singing_global_time (+ slen singing_global_time))
+				  (item.set_feat s 'end singing_global_time))
+				(item.leafs (item.relation syl 'SylStructure))))
+
+	  ;; otherwise, stretch the vowels and not the consonants
+	  (let ((voweltime (- syldur conslen)))
+		(let ((vowelstretch (/ voweltime vowlen)))
+		  (mapcar (lambda (s)
+					(set! slen (get_avg_duration (item.feat s "name")))
+					(if (equal? "+" (item.feat s "ph_vc"))
+						(set! slen (* vowelstretch slen)))
+					(set! singing_global_time (+ slen singing_global_time))
+					(item.set_feat s 'end singing_global_time))
+				  (item.leafs (item.relation syl 'SylStructure))))))
+  (set! restlen (car (syl2rest syl)))
+  (format t "restlen %l\n" restlen)
+  (if (> restlen 0)
+	  (let (nil)
+		(set! lastseg (item.daughtern (item.relation syl 'SylStructure)))
+		(set! SIL (car (car (cdr (assoc 'silences (PhoneSet.description))))))
+		(set! singing_global_time (+ restlen singing_global_time))
+		(set! pau_item_desc (list SIL
+								  (list
+								   (list "end" singing_global_time))))
+		(item.insert (item.relation lastseg 'Segment) pau_item_desc 'after)))
+  (format t "DEBUG do_syl: %l %l\n" syl (item.features syl))
+)
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
